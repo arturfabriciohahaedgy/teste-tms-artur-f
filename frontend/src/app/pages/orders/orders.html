@@ -1,1 +1,102 @@
-Ordens de transporte
+<div class="flex flex-row justify-between">
+  <h1 class="text-4xl">Ordens de transporte</h1>
+  <p-button label="Cadastrar ordem" icon="pi pi-plus" (click)="openDialog()" />
+</div>
+
+<p-table [value]="orders" [tableStyle]="{ 'min-width': '50rem' }" class="mt-4">
+  <ng-template #header>
+    <tr>
+      <th>Número</th>
+      <th>Endereço de destino</th>
+      <th>Endereço de origem</th>
+      <th>Peso (kg)</th>
+      <th>Status</th>
+      <th>Data prevista para entrega</th>
+      <th>Data de criação</th>
+      <th>Data de edição</th>
+      <th>Ações</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-order>
+    <tr>
+      <td>{{ order.number }}</td>
+      <td>{{ order.origin_address }}</td>
+      <td>{{ order.destination_address }}</td>
+      <td>{{ order.weight_kg }}</td>
+      <td>
+        <p-button [label]="order.status | statustitle" />
+      </td>
+      <td>{{ order.scheduled_date | date }}</td>
+      <td>{{ order.created_at | date }}</td>
+      <td>{{ order.edited_at ?? '-' }}</td>
+      <td>
+        <div class="flex gap-2">
+          <p-button
+            icon="pi pi-pencil"
+            severity="contrast"
+            (click)="editDialog(order.id, order.status)"
+          />
+          <p-button icon="pi pi-times" severity="danger" (click)="confirmInactivation($event)" />
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<div class="flex justify-center">
+  <p-dialog
+    header="Cadastro de ordem de transporte"
+    [modal]="true"
+    [(visible)]="formDialogVisible"
+    [style]="{ width: '500px' }"
+  >
+    <form [formGroup]="orderForm">
+      <div class="flex gap-2">
+        <div class="flex flex-col">
+          <label class="font-semibold">Número da ordem</label>
+          <input pInputText formControlName="number" class="flex-auto" />
+        </div>
+        <div class="flex flex-col">
+          <label class="font-semibold">Motorista</label>
+          <p-select
+            class="w-fit"
+            formControlName="driver"
+            [options]="optionsDrivers"
+            optionLabel="label"
+          />
+          <!-- <input pInputText formControlName="cpf" class="flex-auto" /> -->
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <div class="flex flex-col">
+          <label class="font-semibold">Endereço de origem</label>
+          <input pInputText formControlName="origin_address" class="flex-auto" />
+        </div>
+        <div class="flex flex-col">
+          <label class="font-semibold">Endereço de entrega</label>
+          <input pInputText formControlName="destination_address" class="flex-auto" />
+        </div>
+      </div>
+
+      <!-- <div class="mt-2 items-center justify-center"> -->
+      <!--   <div class="flex items-center gap-4"> -->
+      <!--     <label class="font-semibold">Categoria CNH</label> -->
+      <!--     <p-select -->
+      <!--       class="w-fit" -->
+      <!--       formControlName="cnh_category" -->
+      <!--       [options]="optionsCNH" -->
+      <!--       optionLabel="id" -->
+      <!--     /> -->
+      <!--   </div> -->
+      <!-- </div> -->
+      <div class="flex justify-end gap-2 mt-2">
+        <p-button label="Cancelar" severity="secondary" (click)="formDialogVisible = false" />
+        <p-button type="submit" label="Salvar" (click)="formDialogVisible = false" />
+      </div>
+    </form>
+  </p-dialog>
+</div>
+
+<p-confirmdialog />
+<p-toast />

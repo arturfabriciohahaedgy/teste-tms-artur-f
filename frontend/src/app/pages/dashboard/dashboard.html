@@ -1,1 +1,38 @@
-Dashboard
+<div>
+  <h1 class="text-4xl">Dashboard</h1>
+</div>
+
+<p-table [value]="orders" [tableStyle]="{ 'min-width': '50rem' }" class="mt-4">
+  <ng-template #header>
+    <tr>
+      <th>Número</th>
+      <th>Endereço de destino</th>
+      <th>Endereço de origem</th>
+      <th>Peso (kg)</th>
+      <th>Status</th>
+      <th>Data prevista para entrega</th>
+      <th>Data de criação</th>
+      <th>Data de edição</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-order>
+    <tr>
+      <td>{{ order.number }}</td>
+      <td>{{ order.origin_address }}</td>
+      <td>{{ order.destination_address }}</td>
+      <td>{{ order.weight_kg }}</td>
+      <td>
+        <p-button [label]="order.status | statustitle" />
+      </td>
+      <td>{{ order.scheduled_date | date }}</td>
+      <td>{{ order.created_at | date }}</td>
+      <td>{{ order.edited_at ?? '-' }}</td>
+      <!-- <td> -->
+      <!--   <div class="flex gap-2"> -->
+      <!--     <p-button icon="pi pi-pencil" severity="contrast" (click)="editDialog(order.id)" /> -->
+      <!--     <p-button icon="pi pi-times" severity="danger" (click)="confirmInactivation($event)" /> -->
+      <!--   </div> -->
+      <!-- </td> -->
+    </tr>
+  </ng-template>
+</p-table>
