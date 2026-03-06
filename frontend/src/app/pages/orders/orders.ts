@@ -37,6 +37,7 @@ export class Orders {
 
   formDialogVisible = false;
   optionsOrder = [
+    { label: '-', id: '' },
     { label: 'Pendente', id: 'pending' },
     { label: 'Em coleta', id: 'collecting' },
     { label: 'Coletando', id: 'collected' },
@@ -44,6 +45,7 @@ export class Orders {
     { label: 'Entregue', id: 'delivered' },
   ];
   optionsDrivers = [
+    { label: '-', id: 50 },
     { label: 'Marco Rubião', id: 50 },
     { label: 'João Silva', id: 12 },
   ];

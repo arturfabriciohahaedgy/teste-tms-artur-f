@@ -1,5 +1,9 @@
 <div class="flex flex-row justify-between">
-  <h1 class="text-4xl">Ordens de transporte</h1>
+  <div class="flex gap-2">
+    <h1 class="text-4xl">Ordens de transporte</h1>
+    <p-select [options]="optionsDrivers" placeholder="Filtrar motorista" optionLabel="label" />
+    <p-select [options]="optionsOrder" placeholder="Filtrar status" optionLabel="label" />
+  </div>
   <p-button label="Cadastrar ordem" icon="pi pi-plus" (click)="openDialog()" />
 </div>
 
