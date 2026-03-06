@@ -80,7 +80,10 @@ export class Orders {
     this.formDialogVisible = true;
   }
 
-  confirmInactivation(event: Event) {
+  confirmInactivation(
+    event: Event,
+    status: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered',
+  ) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Deseja excluir a ordem de transporte?',
@@ -97,27 +100,24 @@ export class Orders {
         severity: 'danger',
       },
       accept: () => {
+        if (status !== 'pending') {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro ao excluir',
+            detail: 'Não é possível excluir ordens que não estejam pendentes.',
+          });
+          return;
+        }
         this.messageService.add({
           severity: 'info',
-          summary: 'Inativado',
+          summary: 'Exclusão',
           detail: 'Ordem excluída com sucesso.',
         });
       },
     });
   }
 
-  editDialog(
-    id: number,
-    status: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered',
-  ) {
-    if (status !== 'pending') {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro ao excluir',
-        detail: 'Não é possível excluir ordens que não estejam pendentes.',
-      });
-      return;
-    }
+  editDialog(id: number) {
     console.log('id:', id);
     this.formDialogVisible = true;
   }
