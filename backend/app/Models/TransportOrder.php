@@ -18,7 +18,8 @@ class TransportOrder extends Model
         'weight_kg',
         'status',
         'scheduled_date',
-        'notes'
+        'notes',
+        'is_active',
     ];
 }
 

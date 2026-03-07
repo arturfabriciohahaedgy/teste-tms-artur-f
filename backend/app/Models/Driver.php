@@ -15,6 +15,7 @@ class Driver extends Model
         'cnh_number',
         'cnh_category',
         'phone',
+        'is_active',
     ];
 }
 
