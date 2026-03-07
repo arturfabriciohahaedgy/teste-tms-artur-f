@@ -15,5 +15,5 @@ export interface DriverPost {
   cpf: string;
   cnh_number: string;
   cnh_category: string;
-  phone?: string;
+  phone: string | null;
 }

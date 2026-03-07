@@ -1,6 +1,6 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Driver, DriverPost } from '../interface/driver-inteface';
+import { Driver, DriverPost } from '../interface/driver-intefaces';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -9,8 +9,6 @@ export class DriverService {
   private url = `http://localhost:8000/api/driver`;
 
   private drivers = httpResource<Driver[]>(() => this.url);
-
-  // readonly values: Signal<Driver[] | undefined> = this.drivers.value;
 
   getValue() {
     return this.drivers.value() ?? [];
@@ -24,8 +22,12 @@ export class DriverService {
     return this.http.get<Driver>(`${this.url}/${id}`, {});
   }
 
-  createDriver(driver: DriverPost): Observable<DriverPost> {
-    return this.http.post<DriverPost>(`${this.url}`, driver);
+  create(driver: DriverPost): Observable<Driver> {
+    return this.http.post<Driver>(`${this.url}`, driver);
+  }
+
+  edit(driver: DriverPost, id: number): Observable<Driver> {
+    return this.http.put<Driver>(`${this.url}/${id}`, driver);
   }
 
   inactivateDriver(id: number): Observable<DriverPost> {

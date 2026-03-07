@@ -1,13 +1,21 @@
 <div class="flex flex-row justify-between">
   <div class="flex gap-2">
     <h1 class="text-4xl">Ordens de transporte</h1>
-    <p-select [options]="optionsDrivers" placeholder="Filtrar motorista" optionLabel="label" />
+    <p-select
+      [options]="driverService.getValue()"
+      placeholder="Filtrar motorista"
+      optionLabel="name"
+    />
     <p-select [options]="optionsOrder" placeholder="Filtrar status" optionLabel="label" />
   </div>
   <p-button label="Cadastrar ordem" icon="pi pi-plus" (click)="openDialog()" />
 </div>
 
-<p-table [value]="orders" [tableStyle]="{ 'min-width': '50rem' }" class="mt-4">
+<p-table
+  [value]="transportOrderService.getValue()"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  class="mt-4"
+>
   <ng-template #header>
     <tr>
       <th>Número</th>
@@ -17,22 +25,22 @@
       <th>Status</th>
       <th>Data prevista para entrega</th>
       <th>Data de criação</th>
-      <th>Data de edição</th>
+      <th>Última atualização</th>
       <th>Ações</th>
     </tr>
   </ng-template>
   <ng-template #body let-order>
     <tr>
-      <td>{{ order.number }}</td>
+      <td>{{ order.order_number }}</td>
       <td>{{ order.origin_address }}</td>
       <td>{{ order.destination_address }}</td>
-      <td>{{ order.weight_kg }}</td>
+      <td>{{ order.weight_kg ?? '-' }}</td>
       <td>
         <p-button [label]="order.status | statustitle" />
       </td>
       <td>{{ order.scheduled_date | date }}</td>
-      <td>{{ order.created_at | date }}</td>
-      <td>{{ order.edited_at ?? '-' }}</td>
+      <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td>{{ order.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
       <td>
         <div class="flex gap-2">
           <p-button icon="pi pi-pencil" severity="contrast" (click)="editDialog(order.id)" />
@@ -52,51 +60,102 @@
     header="Cadastro de ordem de transporte"
     [modal]="true"
     [(visible)]="formDialogVisible"
-    [style]="{ width: '500px' }"
+    [style]="{ width: '600px' }"
   >
-    <form [formGroup]="orderForm">
-      <div class="flex gap-2">
+    <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-2 gap-2">
         <div class="flex flex-col">
-          <label class="font-semibold">Número da ordem</label>
-          <input pInputText formControlName="number" class="flex-auto" />
+          <label class="font-semibold">Número da ordem*</label>
+          <input pInputText formControlName="order_number" class="flex-auto" />
         </div>
         <div class="flex flex-col">
-          <label class="font-semibold">Motorista</label>
+          <label class="font-semibold">Motorista*</label>
           <p-select
+            appendTo="body"
             class="w-fit"
-            formControlName="driver"
-            [options]="optionsDrivers"
-            optionLabel="label"
+            formControlName="driver_id"
+            [options]="driverService.getValue()"
+            optionLabel="name"
+            optionValue="id"
           />
-          <!-- <input pInputText formControlName="cpf" class="flex-auto" /> -->
         </div>
-      </div>
-
-      <div class="flex gap-2">
+        <!-- <div class="flex flex-col"> -->
+        <!--   <label class="font-semibold">CPF*</label> -->
+        <!--   <input pInputText formControlName="cpf" class="flex-auto" /> -->
+        <!-- </div> -->
         <div class="flex flex-col">
-          <label class="font-semibold">Endereço de origem</label>
+          <label class="font-semibold">Endereço de origem*</label>
           <input pInputText formControlName="origin_address" class="flex-auto" />
         </div>
         <div class="flex flex-col">
-          <label class="font-semibold">Endereço de entrega</label>
+          <label class="font-semibold">Endereço de destino*</label>
           <input pInputText formControlName="destination_address" class="flex-auto" />
         </div>
+        <div class="flex flex-col">
+          <label class="font-semibold">Peso da carga (kg)</label>
+          <input pInputText formControlName="weight_kg" class="flex-auto" />
+        </div>
+        <div class="flex flex-col justify-center">
+          <label class="font-semibold">Data prevista de entrega*</label>
+          <p-datepicker formControlName="scheduled_date" appendTo="body" />
+          <!-- <input pInputText formControlName="weight_kg" class="flex-auto" /> -->
+        </div>
+        <!-- <div class="flex gap-2 items-center justify-center"> -->
+        <!--   <div> -->
+        <!--     <label class="font-semibold">Motorista</label> -->
+        <!--     <p-select -->
+        <!--       class="w-fit" -->
+        <!--       formControlName="driver" -->
+        <!--       [options]="optionsDrivers" -->
+        <!--       optionLabel="label" -->
+        <!--     /> -->
+        <!--      <input pInputText formControlName="cpf" class="flex-auto" /> -->
+        <!--   </div> -->
+        <!-- </div> -->
+      </div>
+      <div class="flex flex-col">
+        <label class="font-semibold">Descrição da carga*</label>
+        <textarea
+          rows="5"
+          cols="30"
+          pTextarea
+          formControlName="cargo_description"
+          variant="filled"
+        ></textarea>
+        <label class="font-semibold">Observações</label>
+        <textarea rows="5" cols="30" pTextarea formControlName="notes" variant="filled"></textarea>
       </div>
 
-      <!-- <div class="mt-2 items-center justify-center"> -->
-      <!--   <div class="flex items-center gap-4"> -->
-      <!--     <label class="font-semibold">Categoria CNH</label> -->
+      <!-- <div class="flex gap-2 items-center justify-center"> -->
+      <!--   <div class="flex flex-col"> -->
+      <!--     <label class="font-semibold">Número da ordem</label> -->
+      <!--     <input pInputText formControlName="number" class="flex-auto" /> -->
+      <!--   </div> -->
+      <!--   <div class="flex flex-col"> -->
+      <!--     <label class="font-semibold">Motorista</label> -->
       <!--     <p-select -->
       <!--       class="w-fit" -->
-      <!--       formControlName="cnh_category" -->
-      <!--       [options]="optionsCNH" -->
-      <!--       optionLabel="id" -->
+      <!--       formControlName="driver" -->
+      <!--       [options]="optionsDrivers" -->
+      <!--       optionLabel="label" -->
       <!--     /> -->
+      <!--     <input pInputText formControlName="cpf" class="flex-auto" /> -->
+      <!--   </div> -->
+      <!-- </div> -->
+      <!---->
+      <!-- <div class="flex gap-2 justify-center"> -->
+      <!--   <div class="flex flex-col"> -->
+      <!--     <label class="font-semibold">Endereço de origem</label> -->
+      <!--     <input pInputText formControlName="origin_address" class="flex-auto" /> -->
+      <!--   </div> -->
+      <!--   <div class="flex flex-col"> -->
+      <!--     <label class="font-semibold">Endereço de entrega</label> -->
+      <!--     <input pInputText formControlName="destination_address" class="flex-auto" /> -->
       <!--   </div> -->
       <!-- </div> -->
       <div class="flex justify-end gap-2 mt-2">
-        <p-button label="Cancelar" severity="secondary" (click)="formDialogVisible = false" />
-        <p-button type="submit" label="Salvar" (click)="formDialogVisible = false" />
+        <p-button label="Cancelar" severity="secondary" (click)="closeDialog()" />
+        <p-button type="submit" label="Salvar" />
       </div>
     </form>
   </p-dialog>

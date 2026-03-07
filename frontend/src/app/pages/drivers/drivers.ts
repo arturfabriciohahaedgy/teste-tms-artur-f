@@ -10,6 +10,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { DriverService } from '../../services/driver-service';
+import { DriverPost } from '../../interface/driver-intefaces';
 
 @Component({
   selector: 'tms-drivers',
@@ -33,7 +34,7 @@ export class Drivers {
   private messageService = inject(MessageService);
   protected readonly driverService = inject(DriverService);
 
-  isFormEdit = false;
+  editId = 0;
   formDialogVisible = false;
   optionsCNH = ['A', 'B', 'C', 'D', 'E'];
   driverForm = new FormGroup({
@@ -51,6 +52,7 @@ export class Drivers {
   closeDialog() {
     this.driverForm.reset();
     this.formDialogVisible = false;
+    this.editId = 0;
   }
 
   confirmInactivation(event: Event, id: number) {
@@ -96,6 +98,7 @@ export class Drivers {
         });
       },
       complete: () => {
+        this.editId = id;
         this.formDialogVisible = true;
       },
     });
@@ -103,6 +106,50 @@ export class Drivers {
 
   reload() {
     this.driverService.reload();
+  }
+
+  createDriver(driver: DriverPost) {
+    this.driverService.create(driver).subscribe({
+      complete: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cadastro concluído',
+          detail: 'Motorista cadastrado com sucesso.',
+        });
+        this.reload();
+        this.closeDialog();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao cadastrar motorista',
+          detail: 'Algum erro ocorreu.',
+        });
+        console.error(err);
+      },
+    });
+  }
+
+  editDriver(driver: DriverPost) {
+    this.driverService.edit(driver, this.editId).subscribe({
+      complete: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Edição concluída',
+          detail: 'Dados do motorista editados com sucesso.',
+        });
+        this.reload();
+        this.closeDialog();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao editar motorista',
+          detail: 'Algum erro ocorreu.',
+        });
+        console.error(err);
+      },
+    });
   }
 
   onSubmit() {
@@ -116,34 +163,17 @@ export class Drivers {
         });
         return;
       }
-      const driver = this.driverForm.value ?? {};
-      this.driverService
-        .createDriver({
-          name: driver.name!,
-          cpf: driver.cpf!,
-          cnh_number: driver.cnh_number!,
-          cnh_category: category,
-          phone: driver.phone ?? undefined,
-        })
-        .subscribe({
-          complete: () => {
-            this.messageService.add({
-              severity: 'info',
-              summary: 'Cadastro concluído',
-              detail: 'Motorista cadastrado com sucesso.',
-            });
-            this.reload();
-            this.closeDialog();
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro ao cadastrar motorista',
-              detail: 'Algum erro ocorreu.',
-            });
-            console.error(err);
-          },
-        });
+      const driverFormValues = this.driverForm.value;
+      const driver: DriverPost = {
+        name: driverFormValues.name!,
+        cnh_number: driverFormValues.cnh_number!,
+        cnh_category: driverFormValues.cnh_category!,
+        cpf: driverFormValues.cpf!,
+        phone: driverFormValues.phone ?? null,
+      };
+
+      if (this.editId) this.editDriver(driver);
+      else this.createDriver(driver);
     }
   }
 }

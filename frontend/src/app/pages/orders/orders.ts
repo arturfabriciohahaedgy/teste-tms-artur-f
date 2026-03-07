@@ -1,6 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
@@ -11,6 +17,11 @@ import { ToastModule } from 'primeng/toast';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
+import { TransportOrderService } from '../../services/transport-order-service';
+import { TextareaModule } from 'primeng/textarea';
+import { DriverService } from '../../services/driver-service';
+import { Driver } from '../../interface/driver-intefaces';
+import { OrderPost } from '../../interface/order-interfaces';
 
 @Component({
   selector: 'tms-orders',
@@ -26,6 +37,8 @@ import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
     ConfirmDialogModule,
     ToastModule,
     DatePickerModule,
+    FormsModule,
+    TextareaModule,
     DatePipe,
     StatusTitlePipe,
   ],
@@ -34,7 +47,10 @@ import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
 export class Orders {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  protected readonly transportOrderService = inject(TransportOrderService);
+  protected readonly driverService = inject(DriverService);
 
+  isFormEdit = false;
   formDialogVisible = false;
   optionsOrder = [
     { label: '-', id: '' },
@@ -44,40 +60,26 @@ export class Orders {
     { label: 'Em entrega', id: 'delivering' },
     { label: 'Entregue', id: 'delivered' },
   ];
-  optionsDrivers = [
-    { label: '-', id: 50 },
-    { label: 'Marco Rubião', id: 50 },
-    { label: 'João Silva', id: 12 },
-  ];
+
+  optionsDrivers: Driver[] = [];
   orderForm = new FormGroup({
-    number: new FormControl('', [Validators.required, Validators.min(1)]),
-    driver: new FormControl('', [Validators.required]),
-    driver_id: new FormControl('', [Validators.required]),
+    order_number: new FormControl('', [Validators.required, Validators.min(1)]),
+    driver_id: new FormControl<number | null>(null, [Validators.required]),
     origin_address: new FormControl('', [Validators.required]),
     destination_address: new FormControl('', [Validators.required]),
     cargo_description: new FormControl('', [Validators.required]),
-    weight_kg: new FormControl('', []),
-    status: new FormControl('', [Validators.required]),
+    weight_kg: new FormControl<number | null>(null, []),
     scheduled_date: new FormControl('', [Validators.required]),
     notes: new FormControl('', []),
   });
-  orders = [
-    {
-      id: 20,
-      number: 2020931,
-      origin_address: 'Rua Beija-Flor',
-      destination_address: 'Centro',
-      weight_kg: 'A',
-      status: 'collecting',
-      scheduled_at: new Date(new Date().getMonth() - 3),
-      created_at: new Date(),
-      edited_at: null,
-      active: true,
-    },
-  ];
 
   openDialog() {
     this.formDialogVisible = true;
+  }
+
+  closeDialog() {
+    this.orderForm.reset();
+    this.formDialogVisible = false;
   }
 
   confirmInactivation(
@@ -122,5 +124,59 @@ export class Orders {
     this.formDialogVisible = true;
   }
 
-  oSubmit() {}
+  reload() {
+    this.transportOrderService.reload();
+  }
+
+  createOrder(order: OrderPost) {
+    this.transportOrderService.create(order).subscribe({
+      complete: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cadastro concluído',
+          detail: 'Motorista cadastrado com sucesso.',
+        });
+        this.reload();
+        this.closeDialog();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao cadastrar motorista',
+          detail: 'Algum erro ocorreu.',
+        });
+        console.error(err);
+      },
+    });
+  }
+
+  onSubmit() {
+    if (this.orderForm.valid && this.orderForm.value) {
+      const driverId = this.orderForm.get('driver')!.value;
+      if (!driverId) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Ordem sem motorista',
+          detail: 'Favor preencher o motorista encarregado pela ordem de transporte.',
+        });
+        return;
+      }
+      const orderFormValues = this.orderForm.value;
+      const scheduledDate = new Date(orderFormValues.scheduled_date!).toISOString().split('T')[0];
+
+      const order: OrderPost = {
+        order_number: orderFormValues.order_number!,
+        driver_id: driverId!,
+        cargo_description: orderFormValues.cargo_description!,
+        origin_address: orderFormValues.origin_address!,
+        destination_address: orderFormValues.destination_address!,
+        scheduled_date: scheduledDate,
+        status: 'pending',
+        weight_kg: orderFormValues.weight_kg!,
+        notes: orderFormValues.notes ?? null,
+      };
+
+      this.createOrder(order);
+    }
+  }
 }
