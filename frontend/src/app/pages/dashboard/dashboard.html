@@ -55,7 +55,8 @@
       <td>{{ order.weight_kg }}</td>
       <!-- TODO: Remover esse botão aqui -->
       <td>
-        <p-button [label]="order.status | statustitle" />
+        {{ order.status | statustitle }}
+        <!-- <p-button [label]="order.status | statustitle" /> -->
       </td>
       <td>{{ order.scheduled_date | date }}</td>
       <td>{{ order.created_at | date }}</td>

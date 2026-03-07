@@ -84,6 +84,14 @@ export class Orders {
     event: Event,
     status: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered',
   ) {
+    if (status !== 'pending') {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro ao excluir',
+        detail: 'Não é possível excluir ordens que não estejam pendentes.',
+      });
+      return;
+    }
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Deseja excluir a ordem de transporte?',
@@ -100,14 +108,6 @@ export class Orders {
         severity: 'danger',
       },
       accept: () => {
-        if (status !== 'pending') {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro ao excluir',
-            detail: 'Não é possível excluir ordens que não estejam pendentes.',
-          });
-          return;
-        }
         this.messageService.add({
           severity: 'info',
           summary: 'Exclusão',

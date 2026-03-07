@@ -35,12 +35,12 @@
       <td>{{ order.edited_at ?? '-' }}</td>
       <td>
         <div class="flex gap-2">
+          <p-button icon="pi pi-pencil" severity="contrast" (click)="editDialog(order.id)" />
           <p-button
-            icon="pi pi-pencil"
-            severity="contrast"
-            (click)="editDialog(order.id, order.status)"
+            icon="pi pi-times"
+            severity="danger"
+            (click)="confirmInactivation($event, order.status)"
           />
-          <p-button icon="pi pi-times" severity="danger" (click)="confirmInactivation($event)" />
         </div>
       </td>
     </tr>

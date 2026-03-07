@@ -9,6 +9,7 @@ import { DatePipe } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { DriverService } from '../../services/driver-service';
 
 @Component({
   selector: 'tms-drivers',
@@ -30,18 +31,11 @@ import { ToastModule } from 'primeng/toast';
 export class Drivers {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  protected readonly driverService = inject(DriverService);
 
+  isFormEdit = false;
   formDialogVisible = false;
-  optionsCNH = [{ id: 'A' }, { id: 'B' }, { id: 'C' }, { id: 'D' }, { id: 'E' }];
-  drivers = [
-    {
-      id: 20,
-      name: 'AAA',
-      cnh_category: 'A',
-      created_at: new Date(),
-      active: true,
-    },
-  ];
+  optionsCNH = ['A', 'B', 'C', 'D', 'E'];
   driverForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     cpf: new FormControl('', [Validators.required]),
@@ -54,7 +48,12 @@ export class Drivers {
     this.formDialogVisible = true;
   }
 
-  confirmInactivation(event: Event) {
+  closeDialog() {
+    this.driverForm.reset();
+    this.formDialogVisible = false;
+  }
+
+  confirmInactivation(event: Event, id: number) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Deseja inativar o motorista?',
@@ -71,19 +70,80 @@ export class Drivers {
         severity: 'danger',
       },
       accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Inativado',
-          detail: 'Motorista inativado com sucesso.',
+        this.driverService.inactivateDriver(id).subscribe({
+          complete: () => {
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Inativado',
+              detail: 'Motorista inativado com sucesso.',
+            });
+            this.reload();
+          },
         });
       },
     });
   }
 
   editDialog(id: number) {
-    console.log('id:', id);
-    this.formDialogVisible = true;
+    this.driverService.getById(id).subscribe({
+      next: (driver) => {
+        this.driverForm.setValue({
+          cnh_category: driver.cnh_category,
+          name: driver.name,
+          cnh_number: driver.cnh_number,
+          phone: driver.phone,
+          cpf: driver.cpf,
+        });
+      },
+      complete: () => {
+        this.formDialogVisible = true;
+      },
+    });
   }
 
-  oSubmit() {}
+  reload() {
+    this.driverService.reload();
+  }
+
+  onSubmit() {
+    if (this.driverForm.valid && this.driverForm.value) {
+      const category = this.driverForm.get('cnh_category')!.value;
+      if (!category) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'CNH sem categoria',
+          detail: 'Favor preencher a categoria da CNH do motorista.',
+        });
+        return;
+      }
+      const driver = this.driverForm.value ?? {};
+      this.driverService
+        .createDriver({
+          name: driver.name!,
+          cpf: driver.cpf!,
+          cnh_number: driver.cnh_number!,
+          cnh_category: category,
+          phone: driver.phone ?? undefined,
+        })
+        .subscribe({
+          complete: () => {
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Cadastro concluído',
+              detail: 'Motorista cadastrado com sucesso.',
+            });
+            this.reload();
+            this.closeDialog();
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro ao cadastrar motorista',
+              detail: 'Algum erro ocorreu.',
+            });
+            console.error(err);
+          },
+        });
+    }
+  }
 }
