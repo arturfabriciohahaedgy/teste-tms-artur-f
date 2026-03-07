@@ -6,22 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use App\Models\Driver;
-/* use Illuminate\Http\RedirectResponse; */
 
 class DriverController extends Controller
 {
-    public function getById(int $id)
-    {
-        $driver = DB::table('drivers')->where('id', $id)->firstOrFail();
-
-        return $driver;
-    }
-
     public function getAll()
     {
         $drivers = DB::table('drivers')->get();
 
         return $drivers;
+    }
+
+    public function getById(int $id)
+    {
+        $driver = DB::table('drivers')->where('id', $id)->firstOrFail();
+
+        return $driver;
     }
 
     public function create(Request $request): JsonResponse
