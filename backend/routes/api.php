@@ -16,7 +16,9 @@ Route::put('/driver/{id}', [DriverController::class, 'update']);
 Route::patch('/driver/{id}/status', [DriverController::class, 'patchStatus']);
 
 Route::get('/order/', [TransportOrderController::class, 'getAll']);
+Route::get('/order/amount', [TransportOrderController::class, 'getAmountOrders']);
 Route::get('/order/{id}', [TransportOrderController::class, 'getById']);
 Route::post('/order/', [TransportOrderController::class, 'create']);
 Route::put('/order/{id}', [TransportOrderController::class, 'update']);
-Route::patch('/order/{id}/status', [TransportOrderController::class, 'patchStatus']);
+Route::patch('/order/{id}/advance', [TransportOrderController::class, 'advanceOrder']);
+Route::delete('/order/{id}', [TransportOrderController::class, 'deleteOrder']);
