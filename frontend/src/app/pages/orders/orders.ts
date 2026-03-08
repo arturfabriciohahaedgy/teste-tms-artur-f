@@ -50,7 +50,7 @@ export class Orders {
   protected readonly transportOrderService = inject(TransportOrderService);
   protected readonly driverService = inject(DriverService);
 
-  isFormEdit = false;
+  editId = 0;
   formDialogVisible = false;
   optionsOrder = [
     { label: '-', id: '' },
@@ -66,10 +66,11 @@ export class Orders {
     order_number: new FormControl('', [Validators.required, Validators.min(1)]),
     driver_id: new FormControl<number | null>(null, [Validators.required]),
     origin_address: new FormControl('', [Validators.required]),
+    status: new FormControl('pending', [Validators.required]),
     destination_address: new FormControl('', [Validators.required]),
     cargo_description: new FormControl('', [Validators.required]),
     weight_kg: new FormControl<number | null>(null, []),
-    scheduled_date: new FormControl('', [Validators.required]),
+    scheduled_date: new FormControl<Date | null>(null, [Validators.required]),
     notes: new FormControl('', []),
   });
 
@@ -78,7 +79,10 @@ export class Orders {
   }
 
   closeDialog() {
-    this.orderForm.reset();
+    this.orderForm.reset({
+      status: 'pending',
+    });
+    console.log(this.orderForm.value);
     this.formDialogVisible = false;
   }
 
@@ -120,8 +124,26 @@ export class Orders {
   }
 
   editDialog(id: number) {
-    console.log('id:', id);
-    this.formDialogVisible = true;
+    this.transportOrderService.getById(id).subscribe({
+      next: (order) => {
+        const date = order.scheduled_date;
+        this.orderForm.setValue({
+          order_number: order.order_number,
+          cargo_description: order.cargo_description,
+          origin_address: order.origin_address,
+          destination_address: order.destination_address,
+          driver_id: order.driver_id,
+          notes: order.notes,
+          status: order.status,
+          scheduled_date: new Date(date),
+          weight_kg: order.weight_kg,
+        });
+      },
+      complete: () => {
+        this.editId = id;
+        this.formDialogVisible = true;
+      },
+    });
   }
 
   reload() {
@@ -150,9 +172,31 @@ export class Orders {
     });
   }
 
+  editOrder(order: OrderPost) {
+    this.transportOrderService.edit(order, this.editId).subscribe({
+      complete: () => {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cadastro concluído',
+          detail: 'Ordem cadastrada com sucesso.',
+        });
+        this.reload();
+        this.closeDialog();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro ao editar ordem',
+          detail: 'Algum erro ocorreu.',
+        });
+        console.error(err);
+      },
+    });
+  }
+
   onSubmit() {
     if (this.orderForm.valid && this.orderForm.value) {
-      const driverId = this.orderForm.get('driver')!.value;
+      const driverId = this.orderForm.get('driver_id')!.value;
       if (!driverId) {
         this.messageService.add({
           severity: 'error',
@@ -162,7 +206,7 @@ export class Orders {
         return;
       }
       const orderFormValues = this.orderForm.value;
-      const scheduledDate = new Date(orderFormValues.scheduled_date!).toISOString().split('T')[0];
+      const scheduledDate = orderFormValues.scheduled_date!.toISOString().split('T')[0];
 
       const order: OrderPost = {
         order_number: orderFormValues.order_number!,
@@ -171,12 +215,13 @@ export class Orders {
         origin_address: orderFormValues.origin_address!,
         destination_address: orderFormValues.destination_address!,
         scheduled_date: scheduledDate,
-        status: 'pending',
+        status: this.editId ? orderFormValues.status! : 'pending',
         weight_kg: orderFormValues.weight_kg!,
         notes: orderFormValues.notes ?? null,
       };
 
-      this.createOrder(order);
+      if (this.editId) this.editOrder(order);
+      else this.createOrder(order);
     }
   }
 }

@@ -36,7 +36,16 @@
       <td>{{ order.destination_address }}</td>
       <td>{{ order.weight_kg ?? '-' }}</td>
       <td>
-        <p-button [label]="order.status | statustitle" />
+        <!-- pendente -->
+        <!-- <p-button severity="danger" [label]="order.status | statustitle" disabled=true/> -->
+        <!-- em coleta -->
+        <!-- <p-button severity="warn" [label]="order.status | statustitle" disabled=true/> -->
+        <!-- coletado -->
+        <p-button [label]="order.status | statustitle" disabled="true" />
+        <!-- em entrega -->
+        <!-- <p-button severity="success" [label]="order.status | statustitle" disabled=true/> -->
+        <!-- entregue -->
+        <!-- <p-button  severity="contrast" [label]="order.status | statustitle" disabled=true/> -->
       </td>
       <td>{{ order.scheduled_date | date }}</td>
       <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>

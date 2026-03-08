@@ -25,4 +25,8 @@ export class TransportOrderService {
   create(order: OrderPost): Observable<OrderPost> {
     return this.http.post<OrderPost>(`${this.url}`, order);
   }
+
+  edit(driver: OrderPost, id: number): Observable<Order> {
+    return this.http.put<Order>(`${this.url}/${id}`, driver);
+  }
 }

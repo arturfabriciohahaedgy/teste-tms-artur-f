@@ -8,7 +8,7 @@ export interface Order {
   weight_kg: number | null;
   // TODO: ver se troca isso par'um enumm ou um 'pending' | [..] depois
   status: string;
-  scheduled_date: Date;
+  scheduled_date: string;
   notes: string | null;
   created_at: Date;
   updated_at: Date;
