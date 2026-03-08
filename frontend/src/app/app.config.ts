@@ -2,12 +2,13 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
 import Nora from '@primeuix/themes/nora';
-
+import { provideNgxMask } from 'ngx-mask';
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideNgxMask(),
     provideHttpClient(),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),

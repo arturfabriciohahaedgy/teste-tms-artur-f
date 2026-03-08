@@ -79,6 +79,7 @@
     [modal]="true"
     [(visible)]="formDialogVisible"
     [style]="{ width: '600px' }"
+    closable="false"
   >
     <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
       <div class="grid grid-cols-2 gap-2">
@@ -107,25 +108,12 @@
         </div>
         <div class="flex flex-col">
           <label class="font-semibold">Peso da carga (kg)</label>
-          <input pInputText formControlName="weight_kg" class="flex-auto" />
+          <input pInputText formControlName="weight_kg" class="flex-auto" mask="0*.0*" />
         </div>
         <div class="flex flex-col justify-center">
           <label class="font-semibold">Data prevista de entrega*</label>
           <p-datepicker formControlName="scheduled_date" appendTo="body" />
-          <!-- <input pInputText formControlName="weight_kg" class="flex-auto" /> -->
         </div>
-        <!-- <div class="flex gap-2 items-center justify-center"> -->
-        <!--   <div> -->
-        <!--     <label class="font-semibold">Motorista</label> -->
-        <!--     <p-select -->
-        <!--       class="w-fit" -->
-        <!--       formControlName="driver" -->
-        <!--       [options]="optionsDrivers" -->
-        <!--       optionLabel="label" -->
-        <!--     /> -->
-        <!--      <input pInputText formControlName="cpf" class="flex-auto" /> -->
-        <!--   </div> -->
-        <!-- </div> -->
       </div>
       <div class="flex flex-col">
         <label class="font-semibold">Descrição da carga*</label>
@@ -139,34 +127,6 @@
         <label class="font-semibold">Observações</label>
         <textarea rows="5" cols="30" pTextarea formControlName="notes" variant="filled"></textarea>
       </div>
-
-      <!-- <div class="flex gap-2 items-center justify-center"> -->
-      <!--   <div class="flex flex-col"> -->
-      <!--     <label class="font-semibold">Número da ordem</label> -->
-      <!--     <input pInputText formControlName="number" class="flex-auto" /> -->
-      <!--   </div> -->
-      <!--   <div class="flex flex-col"> -->
-      <!--     <label class="font-semibold">Motorista</label> -->
-      <!--     <p-select -->
-      <!--       class="w-fit" -->
-      <!--       formControlName="driver" -->
-      <!--       [options]="optionsDrivers" -->
-      <!--       optionLabel="label" -->
-      <!--     /> -->
-      <!--     <input pInputText formControlName="cpf" class="flex-auto" /> -->
-      <!--   </div> -->
-      <!-- </div> -->
-      <!---->
-      <!-- <div class="flex gap-2 justify-center"> -->
-      <!--   <div class="flex flex-col"> -->
-      <!--     <label class="font-semibold">Endereço de origem</label> -->
-      <!--     <input pInputText formControlName="origin_address" class="flex-auto" /> -->
-      <!--   </div> -->
-      <!--   <div class="flex flex-col"> -->
-      <!--     <label class="font-semibold">Endereço de entrega</label> -->
-      <!--     <input pInputText formControlName="destination_address" class="flex-auto" /> -->
-      <!--   </div> -->
-      <!-- </div> -->
       <div class="flex justify-end gap-2 mt-2">
         <p-button label="Cancelar" severity="secondary" (click)="closeDialog()" />
         <p-button type="submit" label="Salvar" />

@@ -7,12 +7,11 @@ import { Observable } from 'rxjs';
 export class TransportOrderService {
   private http = inject(HttpClient);
   private url = `http://localhost:8000/api/order`;
-
   private query = signal('');
 
   private orders = httpResource<Order[]>(() => `${this.url}?${this.query()}`);
 
-  setQuery(value: string | number, type: 'limit' | 'status' | 'driver' | 'clear') {
+  setQuery(value: string | number, type: 'limit' | 'status' | 'driver_id' | 'order_by' | 'clear') {
     if (type === 'clear') {
       this.query.set('');
       return;
@@ -24,18 +23,7 @@ export class TransportOrderService {
       console.log('setString agora:', setString);
     }
 
-    switch (type) {
-      case 'limit':
-        setString += `limit=${value}`;
-        break;
-      case 'status':
-        setString += `status=${value}`;
-        break;
-      case 'driver':
-        setString += `driver_id=${value}`;
-        break;
-    }
-
+    setString += `${type}=${value}`;
     console.log(setString);
     this.query.set(setString);
   }

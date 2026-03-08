@@ -25,15 +25,19 @@ class TransportOrderController extends Controller
             return $query->limit($limit);
         });
 
+        $query->when($request->query('order_by'), function ($query, $orderField) {
+            return $query->orderBy($orderField, 'desc');
+        });
+
         return response()->json($query->get());
     }
 
     public function getById(int $id)
     {
         $order = TransportOrder::find($id);
+        // TODO: Error handling depois
 
         return $order;
-
     }
 
     public function getAmountOrders(Request $request): JsonResponse

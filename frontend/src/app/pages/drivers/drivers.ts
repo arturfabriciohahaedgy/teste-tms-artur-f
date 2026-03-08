@@ -11,6 +11,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { DriverService } from '../../services/driver-service';
 import { DriverPost } from '../../interfaces/driver-intefaces';
+import { NgxMaskDirective } from 'ngx-mask';
 
 @Component({
   selector: 'tms-drivers',
@@ -26,6 +27,7 @@ import { DriverPost } from '../../interfaces/driver-intefaces';
     DatePipe,
     ConfirmDialogModule,
     ToastModule,
+    NgxMaskDirective,
   ],
   providers: [ConfirmationService, MessageService],
 })
@@ -46,7 +48,7 @@ export class Drivers implements OnInit {
   });
 
   ngOnInit(): void {
-    this.driverService.reload();
+    this.driverService.setQuery('', 'clear');
   }
 
   openDialog() {

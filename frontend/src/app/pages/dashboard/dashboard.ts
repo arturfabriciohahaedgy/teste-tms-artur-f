@@ -20,7 +20,9 @@ export class Dashboard implements OnInit {
   indicators: Indicators | null = null;
 
   ngOnInit() {
+    this.transportOrderService.setQuery('', 'clear');
     this.transportOrderService.setQuery(10, 'limit');
+    this.transportOrderService.setQuery('created_at', 'order_by');
 
     this.dashboardService.getIndicators().subscribe({
       next: (indicators) => {

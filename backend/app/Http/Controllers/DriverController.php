@@ -9,16 +9,21 @@ use App\Models\Driver;
 
 class DriverController extends Controller
 {
-    public function getAll()
+    public function getAll(Request $request)
     {
-        $drivers = DB::table('drivers')->get();
+        $query = Driver::query();
 
-        return $drivers;
+        $query->when($request->query('is_active'), function ($query, $isActive) {
+            return $query->where('is_active', filter_var($isActive, FILTER_VALIDATE_BOOLEAN));
+        });
+
+        return response()->json($query->get());
     }
 
     public function getById(int $id)
     {
-        $driver = DB::table('drivers')->where('id', $id)->firstOrFail();
+        $driver = Driver::find($id);
+        // TODO: Error handling depois
 
         return $driver;
     }

@@ -22,6 +22,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { DriverService } from '../../services/driver-service';
 import { Driver } from '../../interfaces/driver-intefaces';
 import { OrderPost } from '../../interfaces/order-interfaces';
+import { NgxMaskDirective } from 'ngx-mask';
 
 interface Status {
   label: string;
@@ -46,6 +47,7 @@ interface Status {
     TextareaModule,
     DatePipe,
     StatusTitlePipe,
+    NgxMaskDirective,
   ],
   providers: [ConfirmationService, MessageService],
 })
@@ -69,6 +71,7 @@ export class Orders implements OnInit {
 
   ngOnInit(): void {
     this.transportOrderService.setQuery('', 'clear');
+    this.driverService.setQuery('true', 'is_active');
   }
 
   optionsDrivers: Driver[] = [];
@@ -209,7 +212,7 @@ export class Orders implements OnInit {
       this.transportOrderService.setQuery('', 'clear');
       return;
     }
-    this.transportOrderService.setQuery(this.selectedDriverFilter.id, 'driver');
+    this.transportOrderService.setQuery(this.selectedDriverFilter.id, 'driver_id');
   }
 
   filterByStatus() {

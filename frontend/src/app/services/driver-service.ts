@@ -1,5 +1,5 @@
 import { HttpClient, httpResource } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Driver, DriverPost } from '../interfaces/driver-intefaces';
 import { Observable } from 'rxjs';
 
@@ -7,8 +7,21 @@ import { Observable } from 'rxjs';
 export class DriverService {
   private http = inject(HttpClient);
   private url = `http://localhost:8000/api/driver`;
+  private query = signal('');
 
-  private drivers = httpResource<Driver[]>(() => this.url);
+  private drivers = httpResource<Driver[]>(() => `${this.url}?${this.query()}`);
+
+  setQuery(value: string | number, type: 'is_active' | 'clear') {
+    if (type === 'clear') {
+      this.query.set('');
+      return;
+    }
+    let setString = '';
+
+    setString += `${type}=${value}`;
+    console.log(setString);
+    this.query.set(setString);
+  }
 
   getValue() {
     return this.drivers.value() ?? [];
