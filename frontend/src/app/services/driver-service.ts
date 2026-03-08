@@ -1,6 +1,6 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Driver, DriverPost } from '../interface/driver-intefaces';
+import { Driver, DriverPost } from '../interfaces/driver-intefaces';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

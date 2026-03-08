@@ -5,8 +5,19 @@
       [options]="driverService.getValue()"
       placeholder="Filtrar motorista"
       optionLabel="name"
+      [(ngModel)]="selectedDriverFilter"
+      (onChange)="filterByDriverId()"
     />
-    <p-select [options]="optionsOrder" placeholder="Filtrar status" optionLabel="label" />
+    <p-select
+      [options]="optionsOrder"
+      placeholder="Filtrar status"
+      optionLabel="label"
+      [(ngModel)]="selectedStatus"
+      (onChange)="filterByStatus()"
+    />
+    @if (selectedStatus !== undefined || selectedDriverFilter !== undefined) {
+      <p-button severity="contrast" label="Limpar filtros" (click)="clearFilters()" />
+    }
   </div>
   <p-button label="Cadastrar ordem" icon="pi pi-plus" (click)="openDialog()" />
 </div>
@@ -36,27 +47,25 @@
       <td>{{ order.destination_address }}</td>
       <td>{{ order.weight_kg ?? '-' }}</td>
       <td>
-        <!-- pendente -->
-        <!-- <p-button severity="danger" [label]="order.status | statustitle" disabled=true/> -->
-        <!-- em coleta -->
-        <!-- <p-button severity="warn" [label]="order.status | statustitle" disabled=true/> -->
-        <!-- coletado -->
-        <p-button [label]="order.status | statustitle" disabled="true" />
-        <!-- em entrega -->
-        <!-- <p-button severity="success" [label]="order.status | statustitle" disabled=true/> -->
-        <!-- entregue -->
-        <!-- <p-button  severity="contrast" [label]="order.status | statustitle" disabled=true/> -->
+        <div class="{{ order.status }}-text">{{ order.status | statustitle }}</div>
       </td>
       <td>{{ order.scheduled_date | date }}</td>
       <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
       <td>{{ order.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
       <td>
         <div class="flex gap-2">
+          <p-button
+            icon="pi pi-arrow-up"
+            severity="success"
+            [disabled]="order.status == 'delivered'"
+            (click)="confirmAdvancement($event, order.status, order.id)"
+          />
           <p-button icon="pi pi-pencil" severity="contrast" (click)="editDialog(order.id)" />
           <p-button
+            [disabled]="order.status != 'pending'"
             icon="pi pi-times"
             severity="danger"
-            (click)="confirmInactivation($event, order.status)"
+            (click)="confirmRemoval($event, order.status, order.id)"
           />
         </div>
       </td>
@@ -88,10 +97,6 @@
             optionValue="id"
           />
         </div>
-        <!-- <div class="flex flex-col"> -->
-        <!--   <label class="font-semibold">CPF*</label> -->
-        <!--   <input pInputText formControlName="cpf" class="flex-auto" /> -->
-        <!-- </div> -->
         <div class="flex flex-col">
           <label class="font-semibold">Endereço de origem*</label>
           <input pInputText formControlName="origin_address" class="flex-auto" />

@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
 import { DashboardCard } from '../../shared/components/dashboard-card/dashboard-card';
+import { TransportOrderService } from '../../services/transport-order-service';
 
 @Component({
   selector: 'tms-dashboard',
@@ -11,19 +12,16 @@ import { DashboardCard } from '../../shared/components/dashboard-card/dashboard-
   styleUrls: ['./dashboard.scss'],
   imports: [ButtonModule, TableModule, DatePipe, StatusTitlePipe, DashboardCard],
 })
-export class Dashboard {
-  orders = [
-    {
-      id: 20,
-      number: 2020931,
-      origin_address: 'Rua Beija-Flor',
-      destination_address: 'Centro',
-      weight_kg: 'A',
-      status: 'collecting',
-      scheduled_at: new Date(new Date().getMonth() - 3),
-      created_at: new Date(),
-      edited_at: null,
-      active: true,
-    },
-  ];
+export class Dashboard implements OnInit {
+  protected readonly transportOrderService = inject(TransportOrderService);
+  indicators = {
+    pending: 0,
+    inProcess: 0,
+    delivered: 0,
+    total: 0,
+  };
+
+  ngOnInit() {
+    this.transportOrderService.setQuery(10, 'limit');
+  }
 }

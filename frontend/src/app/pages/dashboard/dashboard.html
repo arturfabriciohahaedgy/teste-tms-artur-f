@@ -2,14 +2,7 @@
   <h1 class="text-4xl">Dashboard</h1>
 </div>
 
-<div class="grid grid-cols-12 gap-8 mt-4">
-  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
-    <tms-dashboard-card
-      indicatorName="Total"
-      indicatorValue="16"
-      description="Total de ordens de transporte"
-    ></tms-dashboard-card>
-  </div>
+<div class="grid grid-cols-12 gap-8 mt-4 mb-4">
   <div class="col-span-12 lg:col-span-6 xl:col-span-3">
     <tms-dashboard-card
       indicatorName="Pendentes"
@@ -31,10 +24,22 @@
       description="Ordens de transporte já entregues"
     ></tms-dashboard-card>
   </div>
+  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+    <tms-dashboard-card
+      indicatorName="Total"
+      indicatorValue="16"
+      description="Total de ordens de transporte"
+    ></tms-dashboard-card>
+  </div>
 </div>
 
 <!-- limitada em 10 -->
-<p-table [value]="orders" [tableStyle]="{ 'min-width': '50rem' }" class="mt-4">
+<h2 class="text-2xl">Ordens mais recentes</h2>
+<p-table
+  [value]="transportOrderService.getValue()"
+  [tableStyle]="{ 'min-width': '50rem' }"
+  class="mt-4"
+>
   <ng-template #header>
     <tr>
       <th>Número</th>
@@ -49,18 +54,16 @@
   </ng-template>
   <ng-template #body let-order>
     <tr>
-      <td>{{ order.number }}</td>
+      <td>{{ order.order_number }}</td>
       <td>{{ order.origin_address }}</td>
       <td>{{ order.destination_address }}</td>
-      <td>{{ order.weight_kg }}</td>
-      <!-- TODO: Remover esse botão aqui -->
+      <td>{{ order.weight_kg ?? '-' }}</td>
       <td>
-        {{ order.status | statustitle }}
-        <!-- <p-button [label]="order.status | statustitle" /> -->
+        <div class="{{ order.status }}-text">{{ order.status | statustitle }}</div>
       </td>
       <td>{{ order.scheduled_date | date }}</td>
       <td>{{ order.created_at | date }}</td>
-      <td>{{ order.edited_at ?? '-' }}</td>
+      <td>{{ order.updated_at | date }}</td>
     </tr>
   </ng-template>
 </p-table>

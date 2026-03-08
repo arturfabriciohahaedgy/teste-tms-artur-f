@@ -20,8 +20,13 @@ import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
 import { TransportOrderService } from '../../services/transport-order-service';
 import { TextareaModule } from 'primeng/textarea';
 import { DriverService } from '../../services/driver-service';
-import { Driver } from '../../interface/driver-intefaces';
-import { OrderPost } from '../../interface/order-interfaces';
+import { Driver } from '../../interfaces/driver-intefaces';
+import { OrderPost } from '../../interfaces/order-interfaces';
+
+interface Status {
+  label: string;
+  id: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered' | undefined;
+}
 
 @Component({
   selector: 'tms-orders',
@@ -52,11 +57,12 @@ export class Orders {
 
   editId = 0;
   formDialogVisible = false;
-  optionsOrder = [
-    { label: '-', id: '' },
+  selectedDriverFilter: Driver | undefined;
+  selectedStatus: Status | undefined;
+  optionsOrder: Status[] = [
     { label: 'Pendente', id: 'pending' },
     { label: 'Em coleta', id: 'collecting' },
-    { label: 'Coletando', id: 'collected' },
+    { label: 'Coletado', id: 'collected' },
     { label: 'Em entrega', id: 'delivering' },
     { label: 'Entregue', id: 'delivered' },
   ];
@@ -86,9 +92,10 @@ export class Orders {
     this.formDialogVisible = false;
   }
 
-  confirmInactivation(
+  confirmRemoval(
     event: Event,
     status: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered',
+    id: number,
   ) {
     if (status !== 'pending') {
       this.messageService.add({
@@ -110,14 +117,62 @@ export class Orders {
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Inativar',
+        label: 'Confirmar',
         severity: 'danger',
       },
       accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Exclusão',
-          detail: 'Ordem excluída com sucesso.',
+        this.transportOrderService.delete(id).subscribe({
+          complete: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Exclusão',
+              detail: 'Ordem excluída com sucesso.',
+            });
+            this.reload();
+          },
+        });
+      },
+    });
+  }
+
+  confirmAdvancement(
+    event: Event,
+    status: 'pending' | 'collecting' | 'collected' | 'delivering' | 'delivered',
+    id: number,
+  ) {
+    if (status === 'delivered') {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro ao avançar ordem',
+        detail: 'A ordem já foi entregue.',
+      });
+      return;
+    }
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Deseja avançar a ordem de transporte?',
+      header: 'Avançar status',
+      icon: 'pi pi-info-circle',
+      rejectLabel: 'Cancelar',
+      rejectButtonProps: {
+        label: 'Cancelar',
+        severity: 'secondary',
+        outlined: true,
+      },
+      acceptButtonProps: {
+        label: 'Avançar',
+        severity: 'success',
+      },
+      accept: () => {
+        this.transportOrderService.advanceOrder(id).subscribe({
+          complete: () => {
+            this.messageService.add({
+              severity: 'info',
+              summary: 'Exclusão',
+              detail: 'Ordem excluída com sucesso.',
+            });
+            this.reload();
+          },
         });
       },
     });
@@ -144,6 +199,28 @@ export class Orders {
         this.formDialogVisible = true;
       },
     });
+  }
+
+  filterByDriverId() {
+    if (!this.selectedDriverFilter || !this.selectedDriverFilter.id) {
+      this.transportOrderService.setQuery('', 'clear');
+      return;
+    }
+    this.transportOrderService.setQuery(this.selectedDriverFilter.id, 'driver');
+  }
+
+  filterByStatus() {
+    if (!this.selectedStatus || !this.selectedStatus.id) {
+      this.transportOrderService.setQuery('', 'clear');
+      return;
+    }
+    this.transportOrderService.setQuery(this.selectedStatus.id, 'status');
+  }
+
+  clearFilters() {
+    this.selectedDriverFilter = undefined;
+    this.selectedStatus = undefined;
+    this.transportOrderService.setQuery('', 'clear');
   }
 
   reload() {

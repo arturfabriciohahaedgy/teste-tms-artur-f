@@ -10,7 +10,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { DriverService } from '../../services/driver-service';
-import { DriverPost } from '../../interface/driver-intefaces';
+import { DriverPost } from '../../interfaces/driver-intefaces';
 
 @Component({
   selector: 'tms-drivers',
