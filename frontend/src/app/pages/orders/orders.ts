@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   FormControl,
@@ -49,7 +49,7 @@ interface Status {
   ],
   providers: [ConfirmationService, MessageService],
 })
-export class Orders {
+export class Orders implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   protected readonly transportOrderService = inject(TransportOrderService);
@@ -66,6 +66,10 @@ export class Orders {
     { label: 'Em entrega', id: 'delivering' },
     { label: 'Entregue', id: 'delivered' },
   ];
+
+  ngOnInit(): void {
+    this.transportOrderService.setQuery('', 'clear');
+  }
 
   optionsDrivers: Driver[] = [];
   orderForm = new FormGroup({
@@ -88,7 +92,6 @@ export class Orders {
     this.orderForm.reset({
       status: 'pending',
     });
-    console.log(this.orderForm.value);
     this.formDialogVisible = false;
   }
 

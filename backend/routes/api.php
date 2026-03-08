@@ -9,6 +9,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/dashboard/indicators', [TransportOrderController::class, 'getAmountOrders']);
+
 Route::get('/driver/', [DriverController::class, 'getAll']);
 Route::get('/driver/{id}', [DriverController::class, 'getById']);
 Route::post('/driver/', [DriverController::class, 'create']);
@@ -16,7 +18,6 @@ Route::put('/driver/{id}', [DriverController::class, 'update']);
 Route::patch('/driver/{id}/status', [DriverController::class, 'patchStatus']);
 
 Route::get('/order/', [TransportOrderController::class, 'getAll']);
-Route::get('/order/amount', [TransportOrderController::class, 'getAmountOrders']);
 Route::get('/order/{id}', [TransportOrderController::class, 'getById']);
 Route::post('/order/', [TransportOrderController::class, 'create']);
 Route::put('/order/{id}', [TransportOrderController::class, 'update']);

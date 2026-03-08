@@ -8,8 +8,9 @@ import { Component, input } from '@angular/core';
 })
 export class DashboardCard {
   readonly description = input<string>();
-  readonly indicatorValue = input<string>();
+  readonly indicatorValue = input<number>();
   readonly indicatorName = input<string>();
   // TODO: Adicionar esse ícone
-  // readonly icon = input<string>();
+  readonly icon = input<string>();
+  readonly color = input<string>();
 }

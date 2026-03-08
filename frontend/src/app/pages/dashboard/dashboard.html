@@ -3,34 +3,44 @@
 </div>
 
 <div class="grid grid-cols-12 gap-8 mt-4 mb-4">
-  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
-    <tms-dashboard-card
-      indicatorName="Pendentes"
-      indicatorValue="16"
-      description="Ordens de transporte pendentes"
-    ></tms-dashboard-card>
-  </div>
-  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
-    <tms-dashboard-card
-      indicatorName="Em andamento"
-      indicatorValue="16"
-      description="Ordens de transporte em andamento"
-    ></tms-dashboard-card>
-  </div>
-  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
-    <tms-dashboard-card
-      indicatorName="Entregues"
-      indicatorValue="16"
-      description="Ordens de transporte já entregues"
-    ></tms-dashboard-card>
-  </div>
-  <div class="col-span-12 lg:col-span-6 xl:col-span-3">
-    <tms-dashboard-card
-      indicatorName="Total"
-      indicatorValue="16"
-      description="Total de ordens de transporte"
-    ></tms-dashboard-card>
-  </div>
+  @if (indicators) {
+    <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+      <tms-dashboard-card
+        indicatorName="Pendentes"
+        [indicatorValue]="indicators.pendente"
+        description="Ordens de transporte pendentes"
+        icon="pi-inbox"
+        color="text-red-500"
+      ></tms-dashboard-card>
+    </div>
+    <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+      <tms-dashboard-card
+        indicatorName="Em andamento"
+        [indicatorValue]="indicators.em_andamento"
+        description="Ordens de transporte em andamento"
+        icon="pi-box"
+        color="text-yellow-500"
+      ></tms-dashboard-card>
+    </div>
+    <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+      <tms-dashboard-card
+        indicatorName="Entregues"
+        [indicatorValue]="indicators.entregue"
+        description="Ordens de transporte já entregues"
+        icon="pi-check"
+        color="text-green-500"
+      ></tms-dashboard-card>
+    </div>
+    <div class="col-span-12 lg:col-span-6 xl:col-span-3">
+      <tms-dashboard-card
+        indicatorName="Total"
+        [indicatorValue]="indicators.total"
+        description="Total de ordens de transporte"
+        icon="pi-shopping-cart"
+        color="text-blue-500"
+      ></tms-dashboard-card>
+    </div>
+  }
 </div>
 
 <!-- limitada em 10 -->
@@ -61,9 +71,9 @@
       <td>
         <div class="{{ order.status }}-text">{{ order.status | statustitle }}</div>
       </td>
-      <td>{{ order.scheduled_date | date }}</td>
-      <td>{{ order.created_at | date }}</td>
-      <td>{{ order.updated_at | date }}</td>
+      <td>{{ order.scheduled_date | date: 'dd/MM/yyyy' }}</td>
+      <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+      <td>{{ order.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
     </tr>
   </ng-template>
 </p-table>

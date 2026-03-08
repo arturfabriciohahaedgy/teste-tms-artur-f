@@ -5,6 +5,8 @@ import { TableModule } from 'primeng/table';
 import { StatusTitlePipe } from '../../shared/pipes/status-title-pipe';
 import { DashboardCard } from '../../shared/components/dashboard-card/dashboard-card';
 import { TransportOrderService } from '../../services/transport-order-service';
+import { DashboardService } from '../../services/dashboard-service';
+import { Indicators } from '../../interfaces/dashboard-interfaces';
 
 @Component({
   selector: 'tms-dashboard',
@@ -14,14 +16,16 @@ import { TransportOrderService } from '../../services/transport-order-service';
 })
 export class Dashboard implements OnInit {
   protected readonly transportOrderService = inject(TransportOrderService);
-  indicators = {
-    pending: 0,
-    inProcess: 0,
-    delivered: 0,
-    total: 0,
-  };
+  protected readonly dashboardService = inject(DashboardService);
+  indicators: Indicators | null = null;
 
   ngOnInit() {
     this.transportOrderService.setQuery(10, 'limit');
+
+    this.dashboardService.getIndicators().subscribe({
+      next: (indicators) => {
+        this.indicators = indicators;
+      },
+    });
   }
 }

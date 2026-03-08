@@ -38,14 +38,19 @@ class TransportOrderController extends Controller
 
     public function getAmountOrders(Request $request): JsonResponse
     {
-        $query = TransportOrder::query();
-
-        $query->when($request->query('status'), function ($query, $status) {
-            return $query->where('status', $status);
-        });
+        $pending = TransportOrder::where('status', 'pending')->count();
+        $inProcess = TransportOrder::where('status', 'collecting')
+            ->orWhere('status', 'collected')
+            ->orWhere('status', 'delivering')
+            ->count();
+        $delivered = TransportOrder::where('status', 'delivered')->count();
+        $total = TransportOrder::get()->count();
 
         return response()->json([
-            "quantidade" => $query->count(),
+            "pendente" => $pending,
+            "em_andamento" => $inProcess,
+            "entregue" => $delivered,
+            "total" => $total,
         ]);
     }
 

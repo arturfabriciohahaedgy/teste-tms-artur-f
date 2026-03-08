@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
@@ -29,7 +29,7 @@ import { DriverPost } from '../../interfaces/driver-intefaces';
   ],
   providers: [ConfirmationService, MessageService],
 })
-export class Drivers {
+export class Drivers implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   protected readonly driverService = inject(DriverService);
@@ -44,6 +44,10 @@ export class Drivers {
     cnh_category: new FormControl('', [Validators.required]),
     phone: new FormControl('', []),
   });
+
+  ngOnInit(): void {
+    this.driverService.reload();
+  }
 
   openDialog() {
     this.formDialogVisible = true;

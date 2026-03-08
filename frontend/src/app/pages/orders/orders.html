@@ -49,7 +49,7 @@
       <td>
         <div class="{{ order.status }}-text">{{ order.status | statustitle }}</div>
       </td>
-      <td>{{ order.scheduled_date | date }}</td>
+      <td>{{ order.scheduled_date | date: 'dd/MM/yyyy' }}</td>
       <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
       <td>{{ order.updated_at | date: 'dd/MM/yyyy HH:mm' }}</td>
       <td>
