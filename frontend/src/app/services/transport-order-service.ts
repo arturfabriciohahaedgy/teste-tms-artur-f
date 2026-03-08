@@ -2,11 +2,12 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Order, OrderPost } from '../interfaces/order-interfaces';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TransportOrderService {
   private http = inject(HttpClient);
-  private url = `http://localhost:8000/api/order`;
+  private url = `${environment.apiUrl}/order`;
   private query = signal('');
 
   private orders = httpResource<Order[]>(() => `${this.url}?${this.query()}`);

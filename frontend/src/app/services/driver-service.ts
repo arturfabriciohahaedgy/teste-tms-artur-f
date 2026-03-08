@@ -2,11 +2,12 @@ import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Driver, DriverPost } from '../interfaces/driver-intefaces';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DriverService {
   private http = inject(HttpClient);
-  private url = `http://localhost:8000/api/driver`;
+  private url = `${environment.apiUrl}/driver`;
   private query = signal('');
 
   private drivers = httpResource<Driver[]>(() => `${this.url}?${this.query()}`);
