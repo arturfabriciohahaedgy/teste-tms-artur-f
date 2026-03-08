@@ -19,7 +19,6 @@ a {
 
   transition: background-color 75ms ease-out;
 
-  // change overflowing text to ellipsis
   .text-container {
     overflow: hidden;
     text-overflow: ellipsis;

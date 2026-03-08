@@ -19,7 +19,6 @@ export class DriverService {
     let setString = '';
 
     setString += `${type}=${value}`;
-    console.log(setString);
     this.query.set(setString);
   }
 

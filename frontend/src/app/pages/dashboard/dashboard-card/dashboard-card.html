@@ -1,22 +1,17 @@
 <div class="card mb-0">
   <div class="flex justify-between mb-4">
-    <!-- nome do paniel e valor -->
     <div>
       <span class="block {{ color() }} font-medium mb-4">{{ indicatorName() }} </span>
       <div class="text-surface-900 dark:text-surface-0 font-bold text-2xl">
         {{ indicatorValue() }}
       </div>
     </div>
-    <!-- icone do indicador -->
     <div
       class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
       style="width: 2.5rem; height: 2.5rem"
     >
-      <!-- TODO: Usar o ícone enviado pelo componente pai -->
       <i class="pi {{ icon() }} {{ color() }} text-xl!"></i>
-      <!-- <i class="pi pi-shopping-cart text-blue-500 text-xl!"></i> -->
     </div>
   </div>
-  <!-- descrição -->
   <div class="{{ color() }}">{{ description() }}</div>
 </div>

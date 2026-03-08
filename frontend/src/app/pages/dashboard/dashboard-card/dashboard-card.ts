@@ -10,7 +10,6 @@ export class DashboardCard {
   readonly description = input<string>();
   readonly indicatorValue = input<number>();
   readonly indicatorName = input<string>();
-  // TODO: Adicionar esse ícone
   readonly icon = input<string>();
   readonly color = input<string>();
 }

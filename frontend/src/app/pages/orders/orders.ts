@@ -22,7 +22,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { DriverService } from '../../services/driver-service';
 import { Driver } from '../../interfaces/driver-intefaces';
 import { OrderPost } from '../../interfaces/order-interfaces';
-import { NgxMaskDirective } from 'ngx-mask';
+import { MessageModule } from 'primeng/message';
 
 interface Status {
   label: string;
@@ -35,6 +35,7 @@ interface Status {
   styleUrls: ['./orders.scss'],
   imports: [
     ReactiveFormsModule,
+    MessageModule,
     ButtonModule,
     TableModule,
     DialogModule,
@@ -47,7 +48,6 @@ interface Status {
     TextareaModule,
     DatePipe,
     StatusTitlePipe,
-    NgxMaskDirective,
   ],
   providers: [ConfirmationService, MessageService],
 })
@@ -57,6 +57,7 @@ export class Orders implements OnInit {
   protected readonly transportOrderService = inject(TransportOrderService);
   protected readonly driverService = inject(DriverService);
 
+  formSubmitted = false;
   editId = 0;
   formDialogVisible = false;
   selectedDriverFilter: Driver | undefined;
@@ -76,11 +77,15 @@ export class Orders implements OnInit {
 
   optionsDrivers: Driver[] = [];
   orderForm = new FormGroup({
-    order_number: new FormControl('', [Validators.required, Validators.min(1)]),
+    order_number: new FormControl('', [
+      Validators.required,
+      Validators.min(1),
+      Validators.maxLength(20),
+    ]),
     driver_id: new FormControl<number | null>(null, [Validators.required]),
-    origin_address: new FormControl('', [Validators.required]),
+    origin_address: new FormControl('', [Validators.required, Validators.maxLength(240)]),
     status: new FormControl('pending', [Validators.required]),
-    destination_address: new FormControl('', [Validators.required]),
+    destination_address: new FormControl('', [Validators.required, Validators.maxLength(240)]),
     cargo_description: new FormControl('', [Validators.required]),
     weight_kg: new FormControl<number | null>(null, []),
     scheduled_date: new FormControl<Date | null>(null, [Validators.required]),
@@ -92,10 +97,12 @@ export class Orders implements OnInit {
   }
 
   closeDialog() {
-    this.orderForm.reset({
-      status: 'pending',
-    });
+    this.orderForm.reset();
+    const control = this.orderForm.get('status');
+    control!.setValue('pending');
     this.formDialogVisible = false;
+    this.editId = 0;
+    this.formSubmitted = false;
   }
 
   confirmRemoval(
@@ -278,6 +285,7 @@ export class Orders implements OnInit {
   }
 
   onSubmit() {
+    this.formSubmitted = true;
     if (this.orderForm.valid && this.orderForm.value) {
       const driverId = this.orderForm.get('driver_id')!.value;
       if (!driverId) {
@@ -305,6 +313,20 @@ export class Orders implements OnInit {
 
       if (this.editId) this.editOrder(order);
       else this.createOrder(order);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulário inválido',
+        detail: 'Verifique se preencheu os campos corretamente.',
+      });
     }
+  }
+
+  isInvalid(controlName: string): boolean {
+    const control = this.orderForm.get(controlName);
+    if (!control) {
+      return true;
+    }
+    return control?.invalid && (control.touched || this.formSubmitted);
   }
 }

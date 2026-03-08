@@ -17,13 +17,12 @@ class DriverController extends Controller
             return $query->where('is_active', filter_var($isActive, FILTER_VALIDATE_BOOLEAN));
         });
 
-        return response()->json($query->get());
+        return response()->json($query->orderBy('is_active', 'desc')->get());
     }
 
     public function getById(int $id)
     {
         $driver = Driver::find($id);
-        // TODO: Error handling depois
 
         return $driver;
     }
@@ -39,10 +38,15 @@ class DriverController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
+        $driver = Driver::find($id);
+        if (!$driver) {
+            return response()->json([
+                "mensagem" => "Motorista com id '$id' não pôde ser encontrado."
+            ], 400);
+        }
         $rawBody = $request->getContent();
         $data = json_decode($rawBody, true);
 
-        $driver = Driver::find($id);
         $driver->update($data);
         $changes = $driver->getChanges();
 
@@ -51,7 +55,12 @@ class DriverController extends Controller
 
     public function patchStatus(int $id): JsonResponse
     {
-        $driver = Driver::findOrFail($id);
+        $driver = Driver::find($id);
+        if (!$driver) {
+            return response()->json([
+                "mensagem" => "Motorista com id '$id' não pôde ser encontrado."
+            ], 400);
+        }
         $driver->update([
             'is_active' => !$driver->is_active,
         ]);

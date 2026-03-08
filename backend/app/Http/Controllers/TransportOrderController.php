@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use App\Models\TransportOrder;
+use App\Models\Driver;
 
 class TransportOrderController extends Controller
 {
@@ -35,7 +36,6 @@ class TransportOrderController extends Controller
     public function getById(int $id)
     {
         $order = TransportOrder::find($id);
-        // TODO: Error handling depois
 
         return $order;
     }
@@ -60,8 +60,24 @@ class TransportOrderController extends Controller
 
     public function create(Request $request): JsonResponse
     {
+        $driver_id = $request->json('driver_id');
+        $driver = Driver::find($driver_id);
+        if (!$driver) {
+            return response()->json([
+                "mensagem" => "Motorista com id '$driver_id' não pôde ser encontrado."
+            ], 400);
+        }
+
+        if (!$driver->is_active) {
+            return response()->json([
+                "mensagem" => "O motorista associado ao cadastro da ordem está inativado."
+            ], 400);
+        }
+
         $rawBody = $request->getContent();
         $data = json_decode($rawBody, true);
+        if (!$data) return response()->json([]);
+
         $order = TransportOrder::create($data);
 
         return response()->json($order);
@@ -69,10 +85,15 @@ class TransportOrderController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
+        $order = TransportOrder::find($id);
+        if (!$order) {
+            return response()->json([
+                "mensagem" => "Ordem de transporte com id '$id' não pôde ser encontrada."
+            ], 400);
+        }
         $rawBody = $request->getContent();
         $data = json_decode($rawBody, true);
 
-        $order = TransportOrder::find($id);
         $order->update($data);
         $changes = $order->getChanges();
 
@@ -82,6 +103,11 @@ class TransportOrderController extends Controller
     public function advanceOrder(int $id): JsonResponse
     {
         $order = TransportOrder::find($id);
+        if (!$order) {
+            return response()->json([
+                "mensagem" => "Ordem de transporte com id '$id' não pôde ser encontrada."
+            ], 400);
+        }
         $newStatus = '';
 
         switch ($order->status) {
@@ -113,6 +139,11 @@ class TransportOrderController extends Controller
     public function deleteOrder(int $id): JsonResponse
     {
         $order = TransportOrder::find($id);
+        if (!$order) {
+            return response()->json([
+                "mensagem" => "Ordem de transporte com id '$id' não pôde ser encontrada."
+            ], 400);
+        }
         if ($order->status != 'pending') {
             return response()->json(["mensagem" => "Esta ordem não está pendente."], 400);
         }

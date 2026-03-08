@@ -5,10 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\TransportOrderController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 Route::get('/dashboard/indicators', [TransportOrderController::class, 'getAmountOrders']);
 
 Route::get('/driver/', [DriverController::class, 'getAll']);

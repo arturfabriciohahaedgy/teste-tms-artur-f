@@ -6,7 +6,7 @@ export interface Driver {
   cnh_category: string;
   phone: string | null;
   created_at: Date;
-  edited_at: Date;
+  updated_at: Date;
   is_active: boolean;
 }
 

@@ -12,6 +12,7 @@ import { ToastModule } from 'primeng/toast';
 import { DriverService } from '../../services/driver-service';
 import { DriverPost } from '../../interfaces/driver-intefaces';
 import { NgxMaskDirective } from 'ngx-mask';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'tms-drivers',
@@ -28,6 +29,7 @@ import { NgxMaskDirective } from 'ngx-mask';
     ConfirmDialogModule,
     ToastModule,
     NgxMaskDirective,
+    MessageModule,
   ],
   providers: [ConfirmationService, MessageService],
 })
@@ -37,14 +39,15 @@ export class Drivers implements OnInit {
   protected readonly driverService = inject(DriverService);
 
   editId = 0;
+  formSubmitted = false;
   formDialogVisible = false;
   optionsCNH = ['A', 'B', 'C', 'D', 'E'];
   driverForm = new FormGroup({
-    name: new FormControl('', [Validators.required]),
-    cpf: new FormControl('', [Validators.required]),
-    cnh_number: new FormControl('', [Validators.required]),
+    name: new FormControl('', [Validators.required, Validators.maxLength(100)]),
+    cpf: new FormControl('', [Validators.required, Validators.maxLength(14)]),
+    cnh_number: new FormControl('', [Validators.required, Validators.maxLength(20)]),
     cnh_category: new FormControl('', [Validators.required]),
-    phone: new FormControl('', []),
+    phone: new FormControl('', [Validators.maxLength(20)]),
   });
 
   ngOnInit(): void {
@@ -59,13 +62,14 @@ export class Drivers implements OnInit {
     this.driverForm.reset();
     this.formDialogVisible = false;
     this.editId = 0;
+    this.formSubmitted = false;
   }
 
-  confirmInactivation(event: Event, id: number) {
+  confirmInactivation(event: Event, id: number, is_active: boolean) {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
-      message: 'Deseja inativar o motorista?',
-      header: 'Inativar motorista',
+      message: is_active ? 'Deseja inativar o motorista?' : 'Deseja reativar o motorista?',
+      header: `${is_active ? 'Inativar' : 'Reativar'} motorista`,
       icon: 'pi pi-info-circle',
       rejectLabel: 'Cancelar',
       rejectButtonProps: {
@@ -74,7 +78,7 @@ export class Drivers implements OnInit {
         outlined: true,
       },
       acceptButtonProps: {
-        label: 'Inativar',
+        label: is_active ? 'Inativar' : 'Reativar',
         severity: 'danger',
       },
       accept: () => {
@@ -83,7 +87,7 @@ export class Drivers implements OnInit {
             this.messageService.add({
               severity: 'info',
               summary: 'Inativado',
-              detail: 'Motorista inativado com sucesso.',
+              detail: `Motorista ${is_active ? 'inativado' : 'reativado'} com sucesso.`,
             });
             this.reload();
           },
@@ -159,6 +163,7 @@ export class Drivers implements OnInit {
   }
 
   onSubmit() {
+    this.formSubmitted = true;
     if (this.driverForm.valid && this.driverForm.value) {
       const category = this.driverForm.get('cnh_category')!.value;
       if (!category) {
@@ -180,6 +185,20 @@ export class Drivers implements OnInit {
 
       if (this.editId) this.editDriver(driver);
       else this.createDriver(driver);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulário inválido',
+        detail: 'Verifique se preencheu os campos corretamente.',
+      });
     }
+  }
+
+  isInvalid(controlName: string): boolean {
+    const control = this.driverForm.get(controlName);
+    if (!control) {
+      return true;
+    }
+    return control?.invalid && (control.touched || this.formSubmitted);
   }
 }

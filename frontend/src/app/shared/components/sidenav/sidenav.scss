@@ -1,11 +1,9 @@
 :host {
-  // the styles below were moved from the .sidenav class in app.component.scss
   height: 100vh;
   width: var(--sidenav-width);
 
   box-sizing: border-box;
 
-  // makes the sidenav stay in place, even when content is scrollable
   position: sticky;
   top: 0;
 

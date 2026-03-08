@@ -38,7 +38,7 @@
           <p-button
             icon="pi {{ driver.is_active ? 'pi-times' : 'pi-replay' }}"
             severity="danger"
-            (click)="confirmInactivation($event, driver.id)"
+            (click)="confirmInactivation($event, driver.id, driver.is_active)"
           />
         </div>
       </td>
@@ -48,7 +48,7 @@
 
 <div class="card flex justify-center">
   <p-dialog
-    header="Cadastro de motorista"
+    header="{{ editId ? 'Edição' : 'Cadastro' }} de motorista"
     [modal]="true"
     [(visible)]="formDialogVisible"
     [style]="{ width: '500px' }"
@@ -58,11 +58,17 @@
       <div class="flex gap-2 items-center justify-center">
         <div class="flex flex-col">
           <label class="font-semibold">Nome*</label>
-          <input pInputText formControlName="name" class="flex-auto" />
+          <input
+            pInputText
+            formControlName="name"
+            class="flex-auto"
+            [invalid]="isInvalid('name')"
+          />
         </div>
         <div class="flex flex-col">
           <label class="font-semibold">CPF*</label>
           <input
+            [invalid]="isInvalid('cpf')"
             pInputText
             formControlName="cpf"
             mask="000.000.000-00"
@@ -77,12 +83,18 @@
         <div class="flex flex-col">
           <label class="font-semibold">Número da CNH*</label>
           <input
+            [invalid]="isInvalid('cnh_number')"
             pInputText
             formControlName="cnh_number"
             class="flex-auto"
             mask="000000000"
             [validation]="true"
           />
+          @if (isInvalid('cnh_number')) {
+            <p-message severity="error" size="small" variant="simple"
+              >Favor preencher com todos os digitos (9).</p-message
+            >
+          }
         </div>
         <div class="flex flex-col">
           <label class="font-semibold">Telefone</label>
@@ -101,6 +113,7 @@
         <div class="flex items-center gap-4">
           <label class="font-semibold">Categoria CNH*</label>
           <p-select
+            [invalid]="isInvalid('cnh_category')"
             appendTo="body"
             class="w-fit"
             formControlName="cnh_category"
@@ -108,6 +121,14 @@
           />
         </div>
       </div>
+
+      @if (!driverForm.valid && formSubmitted) {
+        <div class="text-center">
+          <p-message severity="error" size="small" variant="simple">
+            Os campos marcados por asterícos (*) são obrigatórios.
+          </p-message>
+        </div>
+      }
       <div class="flex justify-end gap-2">
         <p-button label="Cancelar" severity="secondary" (click)="closeDialog()" />
         <p-button type="submit" label="Salvar" />
@@ -116,6 +137,5 @@
   </p-dialog>
 </div>
 
-<!--  -->
 <p-confirmdialog />
 <p-toast />

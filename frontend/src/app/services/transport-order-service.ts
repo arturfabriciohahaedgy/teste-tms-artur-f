@@ -17,14 +17,16 @@ export class TransportOrderService {
       return;
     }
     let setString = this.query();
-
-    if (setString !== '') {
-      setString += '&';
-      console.log('setString agora:', setString);
+    if (setString.includes(type)) {
+      const params = setString.split('&');
+      const typeIndex = params.findIndex((elem) => elem.includes(type));
+      params[typeIndex] = `${type}=${value}`;
+      setString = params.join('&');
+    } else if (setString !== '') {
+      setString += `&${type}=${value}`;
+    } else {
+      setString = `${type}=${value}`;
     }
-
-    setString += `${type}=${value}`;
-    console.log(setString);
     this.query.set(setString);
   }
 

@@ -6,8 +6,7 @@ export interface Order {
   destination_address: string;
   cargo_description: string;
   weight_kg: number | null;
-  // TODO: ver se troca isso par'um enumm ou um 'pending' | [..] depois
-  status: string;
+  status: 'peding' | 'collected' | 'colecting' | 'delivering' | 'delivered';
   scheduled_date: string;
   notes: string | null;
   created_at: Date;
