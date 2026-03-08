@@ -1,20 +1,29 @@
-# Teste para um TMS
+# Teste de TMS
 
 Projeto feito para um teste técnico de competências no contexto de desenvolvimento web.
+
 Feito utilizando Angular para o front-end e Laravel no back-end.
+
+## Funcionalidades
+
+- CRUD de motoristas.
+- CRUD de ordens de transporte.
+- Dashboard com indicadores sobre o estado da aplicação.
+- Validações de formulários em front-end e de payloads em back-end.
 
 ## Execução do projeto
 
 Requisitos do projeto:
 
-    - v24.11.0
-    - Angular v21
-    - PHP v8.5.3
-    - Composer v2.9.5
+- v24.11.0
+- Angular v21
+- PHP v8.5.3
+- Composer v2.9.5
 
 Este documento assume que o usuário clonou o repositório do jeito como está:
 ```sh
-
+git clone https://github.com/arturfabriciohahaedgy/teste-tms-artur-f.git
+cd teste-tms-artur-f/
 ```
 
 ### Back-end
