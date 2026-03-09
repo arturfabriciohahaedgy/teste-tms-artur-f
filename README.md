@@ -54,6 +54,7 @@ DB_PASSWORD=
 
 VITE_APP_NAME="${APP_NAME}"
 ```
+**Salve o arquivo em** `backend/.env`
 
 3. Executar as migrations e seeders:
 ```sh
